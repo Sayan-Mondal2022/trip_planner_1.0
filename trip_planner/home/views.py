@@ -15,9 +15,6 @@ from huggingface_hub import InferenceClient
 GOOGLE_PLACES_API_KEY = getattr(settings, 'GOOGLE_PLACES_API_KEY', os.getenv('GOOGLE_PLACES_API_KEY'))
 HUGGINGFACE_API_KEY = getattr(settings, 'HUGGINGFACE_API_KEY', os.getenv('HUGGINGFACE_API_KEY'))
 
-GOOGLE_PLACES_API_KEY = getattr(settings, 'GOOGLE_PLACES_API_KEY', 'AIzaSyDmEr11rXfEO4eEsdwr2zPa4S3PEJNp8Ic')
-HF_TOKEN = getattr(settings, 'HF_TOKEN', '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')
-
 # Fix the client initialization logic
 client = None
 if HF_TOKEN:
