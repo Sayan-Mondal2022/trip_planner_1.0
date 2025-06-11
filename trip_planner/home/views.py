@@ -13,7 +13,7 @@ from huggingface_hub import InferenceClient
 
 # Get API keys from environment variables or Django settings for security
 GOOGLE_PLACES_API_KEY = getattr(settings, 'GOOGLE_PLACES_API_KEY', os.getenv('GOOGLE_PLACES_API_KEY'))
-HUGGINGFACE_API_KEY = getattr(settings, 'HUGGINGFACE_API_KEY', os.getenv('HUGGINGFACE_API_KEY'))
+HF_TOKEN = getattr(settings, 'HUGGINGFACE_API_KEY', os.getenv('HUGGINGFACE_API_KEY'))
 
 # Fix the client initialization logic
 client = None
