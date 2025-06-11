@@ -1,0 +1,380 @@
+/* planTrip.css */
+
+/* Root Colors */
+:root {
+    --federal-blue: #03045e;
+    --honolulu-blue: #0077b6;
+    --pacific-cyan: #00b4d8;
+    --non-photo-blue: #90e0ef;
+    --light-cyan: #caf0f8;
+    --primary: #667eea;
+    --danger: #dc3545;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --purple: #6f42c1;
+    --pink: #e83e8c;
+    --secondary: #6c757d;
+    --white: #fff;
+    --gray-light: #f8f9fa;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--federal-blue), var(--pacific-cyan));
+    color: #333;
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 20px;
+}
+
+.chat-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background-color: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(3, 4, 94, 0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    border: none;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px;
+    background-color: var(--light-cyan);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--pacific-cyan) var(--light-cyan);
+}
+
+.chat-bubble {
+    max-width: 80%;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 18px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    animation: fadeIn 0.4s ease-out;
+    font-size: 0.95rem;
+}
+
+.chat-bubble.bot {
+    background-color: #e9f5ff;
+    border-bottom-left-radius: 5px;
+    margin-right: auto;
+    border: 1px solid var(--non-photo-blue);
+    box-shadow: 0 4px 12px rgba(3, 4, 94, 0.08);
+}
+
+.chat-bubble.user {
+    background: linear-gradient(135deg, var(--pacific-cyan), var(--honolulu-blue));
+    color: white;
+    border-bottom-right-radius: 5px;
+    margin-left: auto;
+    box-shadow: 0 4px 12px rgba(0, 180, 216, 0.2);
+}
+
+.chat-bubble.system {
+    background-color: var(--gray-light);
+    border: 1px solid #dee2e6;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 90%;
+    font-size: 0.9rem;
+    color: var(--federal-blue);
+}
+
+.typing-indicator {
+    background-color: white;
+    padding: 12px 18px;
+    border-radius: 18px;
+    width: fit-content;
+    margin-right: auto;
+    border: 1px solid var(--non-photo-blue);
+    box-shadow: 0 2px 8px rgba(3, 4, 94, 0.05);
+}
+
+.typing-animation span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--pacific-cyan);
+    display: inline-block;
+    animation: typing 1.6s infinite ease-in-out;
+}
+
+.typing-animation span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-animation span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    30% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+#chat-input-container {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-top: 1px solid var(--non-photo-blue);
+    padding: 10px 16px;
+}
+
+#chat-input {
+    flex: 1;
+    border: none;
+    border-radius: 0;
+    padding: 18px 24px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.4s ease;
+    background-color: white;
+    min-height: 68px;
+}
+
+#chat-input:focus {
+    background-color: var(--light-cyan);
+}
+
+#send-btn {
+    margin: 0 16px;
+    background: linear-gradient(135deg, var(--pacific-cyan), var(--honolulu-blue));
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 180, 216, 0.2);
+}
+
+#send-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 180, 216, 0.35);
+}
+
+#send-btn:disabled {
+    background: var(--non-photo-blue);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.options-container .options-grid,
+.multi-options-container .multi-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-top: 15px;
+}
+
+.option-card {
+    background: white;
+    border: 1px solid var(--non-photo-blue);
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 2px 8px rgba(3, 4, 94, 0.05);
+}
+
+.option-card:hover {
+    border-color: var(--pacific-cyan);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(0, 180, 216, 0.18);
+}
+
+.option-card.selected {
+    border-color: var(--pacific-cyan);
+    background: linear-gradient(135deg, var(--pacific-cyan), var(--honolulu-blue));
+    color: white;
+    transform: scale(1.03);
+}
+
+.option-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.option-icon {
+    flex-shrink: 0;
+    color: var(--pacific-cyan);
+}
+
+.progress-container {
+    margin: 24px 0;
+}
+
+.progress-track {
+    height: 8px;
+    background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e6 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-glow {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 2.5s infinite;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+}
+
+.recommendations-container {
+    background-color: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 20px;
+    border: 1px solid var(--non-photo-blue);
+    box-shadow: 0 8px 24px rgba(3, 4, 94, 0.08);
+}
+
+.recommendation-card {
+    transition: all 0.4s ease;
+    border: 1px solid var(--non-photo-blue);
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100%;
+    background: white;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0, 180, 216, 0.18);
+    border-color: var(--pacific-cyan);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    background-color: var(--non-photo-blue);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: var(--federal-blue);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    color: var(--federal-blue);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.text-muted {
+    font-size: 0.8rem;
+    color: var(--honolulu-blue) !important;
+}
+
+#error-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    max-width: 90%;
+    text-align: center;
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #5a67d8;
+    border-color: #5a67d8;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .chat-container {
+        height: 85vh;
+        margin: 1rem auto;
+        border-radius: 0;
+    }
+
+    .chat-messages {
+        padding: 18px;
+    }
+
+    #chat-input {
+        padding: 14px 18px;
+        min-height: 60px;
+    }
+
+    #send-btn {
+        width: 44px;
+        height: 44px;
+        margin: 0 12px;
+    }
+
+    .options-grid,
+    .multi-options-grid {
+        grid-template-columns: 1fr;
+    }
+}

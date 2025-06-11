@@ -1,0 +1,11 @@
+<!-- itineraryPlan/templates/itineraryPlan/itinerary.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ trip.title }}</h1>
+<div class="trip-details">
+    <p><strong>Destination:</strong> {{ trip.destination }}</p>
+    <p><strong>Dates:</strong> {{ trip.start_date }} to {{ trip.end_date }}</p>
+    <p><strong>Description:</strong> {{ trip.description }}</p>
+</div>
+{% endblock %}

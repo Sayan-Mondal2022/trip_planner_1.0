@@ -1,0 +1,156 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Trip Recommendations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static "css/recommendations.css" %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-map-marked-alt"></i> Your Personalized Trip to
+                <span id="destinationHeader">[Destination]</span>
+            </h1>
+            <p>Recommendations based on your preferences</p>
+            <div class="trip-summary">
+                <div class="summary-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="tripDestination">Loading destination...</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-users"></i>
+                    <span id="tripTravelers">Loading group size...</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-calendar"></i>
+                    <span id="tripDuration">Loading duration...</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-heart"></i>
+                    <span id="tripInterests">Loading interests...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="sidebar">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="places">
+                        <i class="fas fa-map-marked-alt"></i>
+                        Recommended Places
+                    </button>
+                    <button class="tab-button" data-tab="itinerary">
+                        <i class="fas fa-calendar-alt"></i>
+                        Your Itinerary
+                    </button>
+                    <div class="trip-actions">
+                        <button class="action-btn" id="saveTripBtn">
+                            <i class="fas fa-bookmark"></i> Save Trip
+                        </button>
+                        <button class="action-btn" id="shareTripBtn">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- Places Tab -->
+                <div id="places" class="tab-content active">
+                    <div class="places-header">
+                        <h2><i class="fas fa-star"></i> Recommended Places for You</h2>
+                    </div>
+
+                    <div class="selection-summary" style="display: none" id="selectionSummary">
+                        <div class="selected-count">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="selectedCount">0</span> places selected
+                        </div>
+                        <button class="generate-btn" onclick="generateItinerary()">
+                            <i class="fas fa-magic"></i> Generate Itinerary
+                        </button>
+                    </div>
+
+                    <div class="places-loading" id="placesLoading">
+                        <div class="spinner"></div>
+                        <p>Finding perfect places for your trip...</p>
+                    </div>
+
+                    <div class="places-grid" id="placesGrid">
+                        <!-- Places will be loaded dynamically -->
+                    </div>
+
+                    <div class="places-empty" id="placesEmpty" style="display: none">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <h3>No places found matching your criteria</h3>
+                        <p>
+                            Try adjusting your filters or
+                            <a href="#" onclick="refreshRecommendations()">refresh recommendations</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Itinerary Tab -->
+                <div id="itinerary" class="tab-content">
+                    <h2>
+                        <i class="fas fa-calendar-alt"></i> Your Personalized Itinerary
+                    </h2>
+
+                    <div class="itinerary-controls">
+                        <div class="control-row">
+                            <button class="action-btn" onclick="regenerateItinerary()">
+                                <i class="fas fa-sync-alt"></i> Regenerate
+                            </button>
+                            <button class="action-btn" onclick="downloadItinerary()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="action-btn" onclick="printItinerary()">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="loading-spinner" id="itineraryLoading">
+                        <div class="spinner"></div>
+                        <p>Creating your perfect itinerary...</p>
+                    </div>
+
+                    <div id="generatedItinerary" style="display: none">
+                        <div class="itinerary-header">
+                            <div class="itinerary-title">
+                                <h3 id="itineraryTripTitle">Your Trip to [Destination]</h3>
+                                <div class="itinerary-dates" id="itineraryDates">[Dates]</div>
+                            </div>
+                            <div class="itinerary-stats">
+                                <div>
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span id="itineraryPlaces">0</span> places included
+                                </div>
+                            </div>
+                        </div>
+                        <div class="generated-itinerary" id="itineraryContent">
+                            <!-- Itinerary will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="empty-state" id="itineraryEmptyState">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Ready to plan your perfect trip?</h3>
+                        <p>
+                            Select some places from the "Recommended Places" tab, then click
+                            "Generate Itinerary" to create your personalized travel plan.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

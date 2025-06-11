@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Trip Planner - Chat Interface</title>
+    <style>
+      :root {
+        --federal-blue: #03045eff;
+        --honolulu-blue: #0077b6ff;
+        --pacific-cyan: #00b4d8ff;
+        --non-photo-blue: #90e0efff;
+        --light-cyan: #caf0f8ff;
+        --white: #ffffff;
+        --light-gray: #f8f9fa;
+        --dark-gray: #6c757d;
+        --success-green: #28a745;
+        --shadow: rgba(3, 4, 94, 0.1);
+        --hover-shadow: rgba(0, 119, 182, 0.2);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--light-cyan) 0%,
+          var(--non-photo-blue) 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Header */
+      .chat-header {
+        background: linear-gradient(
+          90deg,
+          var(--federal-blue) 0%,
+          var(--honolulu-blue) 100%
+        );
+        color: var(--white);
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 10px var(--shadow);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--pacific-cyan);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+
+      .logo h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .header-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--success-green);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      /* Main Chat Container */
+      .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 0 1rem;
+        height: calc(100vh - 80px);
+      }
+
+      /* Chat Messages Area */
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .message {
+        display: flex;
+        margin-bottom: 1rem;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .message.user {
+        justify-content: flex-end;
+      }
+
+      .message.bot {
+        justify-content: flex-start;
+      }
+
+      .message-content {
+        max-width: 70%;
+        padding: 1rem 1.5rem;
+        border-radius: 20px;
+        position: relative;
+        word-wrap: break-word;
+      }
+
+      .message.user .message-content {
+        background: linear-gradient(
+          135deg,
+          var(--honolulu-blue) 0%,
+          var(--pacific-cyan) 100%
+        );
+        color: var(--white);
+        border-bottom-right-radius: 5px;
+      }
+
+      .message.bot .message-content {
+        background: var(--white);
+        color: var(--federal-blue);
+        border: 1px solid var(--non-photo-blue);
+        border-bottom-left-radius: 5px;
+        box-shadow: 0 2px 10px var(--shadow);
+      }
+
+      .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 12px;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+
+      .message.user .message-avatar {
+        background: var(--pacific-cyan);
+        color: var(--white);
+        order: 2;
+      }
+
+      .message.bot .message-avatar {
+        background: var(--federal-blue);
+        color: var(--white);
+      }
+
+      .message.user .message-content {
+        order: 1;
+      }
+
+      /* Interactive Buttons */
+      .option-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .option-btn {
+        background: var(--white);
+        color: var(--honolulu-blue);
+        border: 2px solid var(--non-photo-blue);
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .option-btn:hover {
+        background: var(--non-photo-blue);
+        border-color: var(--pacific-cyan);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px var(--hover-shadow);
+      }
+
+      .option-btn:active {
+        transform: translateY(0);
+      }
+
+      /* Multi-select mood boxes */
+      .mood-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-top: 15px;
+      }
+
+      .mood-box {
+        background: var(--white);
+        color: var(--federal-blue);
+        border: 2px solid var(--non-photo-blue);
+        padding: 15px;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mood-box:hover {
+        border-color: var(--pacific-cyan);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px var(--hover-shadow);
+      }
+
+      .mood-box.selected {
+        background: linear-gradient(
+          135deg,
+          var(--pacific-cyan) 0%,
+          var(--honolulu-blue) 100%
+        );
+        color: var(--white);
+        border-color: var(--honolulu-blue);
+        box-shadow: 0 4px 15px var(--hover-shadow);
+      }
+
+      .mood-icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .mood-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .mood-desc {
+        font-size: 0.8rem;
+        opacity: 0.8;
+      }
+
+      .mood-box.selected .mood-desc {
+        opacity: 0.9;
+      }
+
+      /* Continue button for mood selection */
+      .continue-btn {
+        background: linear-gradient(
+          135deg,
+          var(--honolulu-blue) 0%,
+          var(--pacific-cyan) 100%
+        );
+        color: var(--white);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .continue-btn.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .continue-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px var(--hover-shadow);
+      }
+
+      /* Typing Indicator */
+      .typing-indicator {
+        display: none;
+        padding: 1rem 1.5rem;
+        background: var(--white);
+        border-radius: 20px;
+        border-bottom-left-radius: 5px;
+        max-width: 70%;
+        margin-left: 52px;
+        box-shadow: 0 2px 10px var(--shadow);
+      }
+
+      .typing-dots {
+        display: flex;
+        gap: 4px;
+      }
+
+      .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--honolulu-blue);
+        border-radius: 50%;
+        animation: typing 1.4s infinite ease-in-out;
+      }
+
+      .typing-dot:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+      .typing-dot:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+
+      @keyframes typing {
+        0%,
+        80%,
+        100% {
+          transform: scale(0.8);
+          opacity: 0.5;
+        }
+        40% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* Chat Input Area */
+      .chat-input-container {
+        padding: 1.5rem 0;
+        background: var(--white);
+        border-top: 1px solid var(--non-photo-blue);
+        margin: 0 -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .chat-input-wrapper {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        max-width: 100%;
+      }
+
+      .chat-input {
+        flex: 1;
+        border: 2px solid var(--non-photo-blue);
+        border-radius: 25px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-family: inherit;
+        resize: none;
+        outline: none;
+        transition: all 0.3s ease;
+        max-height: 120px;
+        min-height: 50px;
+      }
+
+      .chat-input:focus {
+        border-color: var(--pacific-cyan);
+        box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
+      }
+
+      .send-button {
+        width: 50px;
+        height: 50px;
+        border: none;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--honolulu-blue) 0%,
+          var(--pacific-cyan) 100%
+        );
+        color: var(--white);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+      }
+
+      .send-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
+      }
+
+      .send-button:active {
+        transform: scale(0.95);
+      }
+
+      .send-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Welcome Message */
+      .welcome-message {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--federal-blue);
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        background: linear-gradient(
+          135deg,
+          var(--federal-blue) 0%,
+          var(--honolulu-blue) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .welcome-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.8;
+        margin-bottom: 2rem;
+      }
+
+      .quick-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+
+      .suggestion-chip {
+        background: var(--white);
+        color: var(--honolulu-blue);
+        border: 2px solid var(--non-photo-blue);
+        padding: 12px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .suggestion-chip:hover {
+        background: var(--non-photo-blue);
+        border-color: var(--pacific-cyan);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px var(--hover-shadow);
+      }
+
+      /* Loading Animation */
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid var(--non-photo-blue);
+        border-radius: 50%;
+        border-top-color: var(--pacific-cyan);
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .header-content {
+          padding: 0 1rem;
+        }
+
+        .logo h1 {
+          font-size: 1.2rem;
+        }
+
+        .chat-messages {
+          padding: 1rem 0;
+        }
+
+        .message-content {
+          max-width: 85%;
+        }
+
+        .welcome-title {
+          font-size: 1.5rem;
+        }
+
+        .mood-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .option-buttons {
+          flex-direction: column;
+        }
+
+        .option-btn {
+          justify-content: center;
+        }
+      }
+
+      /* Scrollbar Styling */
+      .chat-messages::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .chat-messages::-webkit-scrollbar-track {
+        background: var(--light-cyan);
+        border-radius: 3px;
+      }
+
+      .chat-messages::-webkit-scrollbar-thumb {
+        background: var(--pacific-cyan);
+        border-radius: 3px;
+      }
+
+      .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: var(--honolulu-blue);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">🗺️</div>
+          <h1>AI Trip Planner</h1>
+        </div>
+        <div class="header-status">
+          <div class="status-dot"></div>
+          <span>AI Assistant Online</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Chat Container -->
+    <div class="chat-container">
+      <!-- Chat Messages Area -->
+      <div class="chat-messages" id="chatMessages">
+        <!-- Welcome Message -->
+        <div class="welcome-message">
+          <h2 class="welcome-title">Plan Your Perfect Trip! ✈️</h2>
+          <p class="welcome-subtitle">
+            I'm your AI travel assistant. Tell me where you'd like to go and
+            I'll help you create an amazing itinerary!
+          </p>
+
+          <div class="quick-suggestions">
+            <div
+              class="suggestion-chip"
+              onclick="sendQuickMessage('Plan a weekend trip to Paris')"
+            >
+              🇫🇷 Weekend in Paris
+            </div>
+            <div
+              class="suggestion-chip"
+              onclick="sendQuickMessage('I want to go on a family vacation')"
+            >
+              👨‍👩‍👧‍👦 Family vacation ideas
+            </div>
+            <div
+              class="suggestion-chip"
+              onclick="sendQuickMessage('Adventure trip for solo traveler')"
+            >
+              🎒 Solo adventure trip
+            </div>
+            <div
+              class="suggestion-chip"
+              onclick="sendQuickMessage('Romantic getaway for couples')"
+            >
+              💕 Romantic getaway
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="chat-input-container">
+        <div class="chat-input-wrapper">
+          <textarea
+            class="chat-input"
+            id="chatInput"
+            placeholder="Where would you like to go? Tell me about your dream trip..."
+            rows="1"
+          ></textarea>
+          <button class="send-button" id="sendButton" onclick="sendMessage()">
+            <span>➤</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const chatMessages = document.getElementById("chatMessages");
+      const chatInput = document.getElementById("chatInput");
+      const sendButton = document.getElementById("sendButton");
+      const typingIndicator = document.getElementById("typingIndicator");
+
+      // Improved scrollToBottom function
+      function scrollToBottom() {
+        chatMessages.scrollTo({
+          top: chatMessages.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+
+      // Auto-resize textarea
+      chatInput.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = Math.min(this.scrollHeight, 120) + "px";
+        scrollToBottom();
+      });
+
+      // Send message on Enter key
+      chatInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      // Enhanced trip data structure to match your requirements
+      let messageCount = 0;
+      let tripData = {
+        source: "",
+        destination: "",
+        travel_date: "",
+        duration: "",
+        num_travelers: 0,
+        traveler_type: "",
+        moods: [],
+        transport_type: "",
+        accommodation: "",
+        budget: "",
+        route_preference: "",
+        weather_preference: "",
+        show_popular: false,
+        save_preferences: false,
+      };
+      let selectedMoods = [];
+
+      function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addMessage(message, "user");
+        chatInput.value = "";
+        chatInput.style.height = "auto";
+
+        showTypingIndicator();
+
+        setTimeout(() => {
+          hideTypingIndicator();
+          processUserMessage(message);
+        }, 1000 + Math.random() * 1000);
+      }
+
+      function sendQuickMessage(message) {
+        chatInput.value = message;
+        sendMessage();
+        scrollToBottom();
+      }
+
+      function sendButtonResponse(response, data = null) {
+        addMessage(response, "user");
+
+        if (data) {
+          Object.assign(tripData, data);
+
+          // Auto-set num_travelers based on traveler_type if not already set
+          if (!tripData.num_travelers && tripData.traveler_type) {
+            if (tripData.traveler_type === "solo") {
+              tripData.num_travelers = 1;
+            } else if (tripData.traveler_type === "couple") {
+              tripData.num_travelers = 2;
+            }
+          }
+        }
+
+        showTypingIndicator();
+
+        setTimeout(() => {
+          hideTypingIndicator();
+          messageCount++;
+          continueConversation();
+        }, 800);
+      }
+
+      function addMessage(content, type) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${type}`;
+
+        const avatar = document.createElement("div");
+        avatar.className = "message-avatar";
+        avatar.innerHTML = type === "user" ? "👤" : "🤖";
+
+        const messageContent = document.createElement("div");
+        messageContent.className = "message-content";
+        messageContent.innerHTML = content;
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageContent);
+
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+      }
+
+      function showTypingIndicator() {
+        typingIndicator.style.display = "block";
+        scrollToBottom();
+      }
+
+      function hideTypingIndicator() {
+        typingIndicator.style.display = "none";
+      }
+
+      function processUserMessage(message) {
+        switch (messageCount) {
+          case 1:
+            tripData.source = message.trim();
+            break;
+          case 2:
+            tripData.destination = message.trim();
+            break;
+          case 3:
+            tripData.travel_date = message.trim();
+            break;
+          case 4:
+            tripData.duration = message.trim();
+            break;
+          case 5:
+            tripData.num_travelers = parseInt(message) || 1;
+            break;
+        }
+        messageCount++;
+        continueConversation();
+      }
+
+      function continueConversation() {
+        switch (messageCount) {
+          case 1:
+            askSource();
+            break;
+          case 2:
+            askDestination();
+            break;
+          case 3:
+            askTravelDate();
+            break;
+          case 4:
+            askDuration();
+            break;
+          case 5:
+            askTravelGroup();
+            break;
+          case 6:
+            if (
+              tripData.traveler_type === "solo" ||
+              tripData.traveler_type === "couple"
+            ) {
+              messageCount++;
+              continueConversation();
+            } else {
+              askNumTravelers();
+            }
+            break;
+          case 7:
+            askMoodPreferences();
+            break;
+          case 8:
+            askTransportation();
+            break;
+          case 9:
+            askAccommodation();
+            break;
+          case 10:
+            askBudget();
+            break;
+          case 11:
+            askRoutePreference();
+            break;
+          case 12:
+            askWeatherPreference();
+            break;
+          case 13:
+            askShowPopular();
+            break;
+          case 14:
+            askSavePreferences();
+            break;
+          case 15:
+            generateRecommendations();
+            break;
+          default:
+            handleAdditionalQuestions();
+        }
+      }
+
+      function askSource() {
+        const content =
+          "Welcome to your personalized travel planning experience! 🌟<br><br>To create the perfect itinerary for you, I'll need to gather some information about your travel preferences.<br><br>Let's begin: <strong>Where will you be starting your journey from?</strong><br><br>Please enter your departure city or location.";
+        addMessage(content, "bot");
+      }
+
+      function askDestination() {
+        const content =
+          "Excellent! Now, <strong>what destination has captured your imagination?</strong> ✈️<br><br>Please share the city or region you'd like to explore.";
+        addMessage(content, "bot");
+      }
+
+      function askTravelDate() {
+        const content =
+          "Perfect choice! <strong>When are you planning to embark on this adventure?</strong> 📅<br><br>Please provide your preferred travel date in <strong>YYYY-MM-DD</strong> format (e.g., 2024-07-15).";
+        addMessage(content, "bot");
+      }
+
+      function askDuration() {
+        const content =
+          "Wonderful! <strong>How many days would you like to dedicate to this journey?</strong> 🕒<br><br>Please enter the number of days you plan to travel (e.g., 7 for a week-long trip).";
+        addMessage(content, "bot");
+      }
+
+      function askNumTravelers() {
+        const content =
+          "<strong>How many travelers will be joining this adventure?</strong> 👥<br><br>Please specify the total number of people in your travel group.";
+        addMessage(content, "bot");
+      }
+
+      function askShowPopular() {
+        const content = `<strong>Would you like to include renowned tourist attractions in your itinerary?</strong> 🌟<br><br>These popular destinations offer well-established experiences and are often highlights of any visit.
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="sendButtonResponse('Yes, I would like to explore popular attractions', { show_popular: true })">✅ Yes, include popular spots</button>
+                    <button class="option-btn" onclick="sendButtonResponse('No, I prefer discovering hidden gems', { show_popular: false })">💎 Focus on hidden gems</button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function askSavePreferences() {
+        const content = `<strong>Would you like us to save your travel preferences for future trip planning?</strong> 💾<br><br>This will help us provide even more personalized recommendations in the future.
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="handleSavePreferences(true)">✅ Save my preferences</button>
+                    <button class="option-btn" onclick="handleSavePreferences(false)">🚫 Don't save</button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function handleSavePreferences(shouldSave) {
+        if (shouldSave) {
+          tripData.save_preferences = true;
+          addMessage("Yes, please save my preferences", "user");
+          showTypingIndicator();
+
+          // Save the trip data
+          saveTripData().then((success) => {
+            hideTypingIndicator();
+            if (success) {
+              addMessage(
+                "Perfect! Your travel preferences have been successfully saved. I'll use this information to provide even better recommendations for your future trips! ✅",
+                "bot"
+              );
+            } else {
+              addMessage(
+                "I've noted your preference to save your information. Your travel preferences will be remembered for this session! 📝",
+                "bot"
+              );
+            }
+            messageCount++;
+            continueConversation();
+          });
+        } else {
+          tripData.save_preferences = false;
+          sendButtonResponse("No, thank you", { save_preferences: false });
+        }
+      }
+
+      async function saveTripData() {
+        try {
+          // Ensure moods are properly set
+          if (selectedMoods.length > 0) {
+            tripData.moods = [...selectedMoods];
+          }
+
+          // Save to sessionStorage for immediate client-side access
+          sessionStorage.setItem("current_trip", JSON.stringify(tripData));
+
+          const response = await fetch("/api/save-trip/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCookie("csrftoken"),
+            },
+            body: JSON.stringify(tripData),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to save trip");
+          }
+
+          const data = await response.json();
+
+          if (data.success) {
+            console.log("Trip saved successfully:", data);
+            sessionStorage.setItem("current_trip_id", data.trip_id);
+            return true;
+          } else {
+            console.error("Failed to save trip:", data.error);
+            return false;
+          }
+        } catch (error) {
+          console.error("Error saving trip:", error);
+          return false;
+        }
+      }
+
+      function getSavedTrip() {
+        const tripData = sessionStorage.getItem("current_trip");
+        return tripData ? JSON.parse(tripData) : null;
+      }
+
+      // Add this function to retrieve trip ID
+      function getSavedTripId() {
+        return sessionStorage.getItem("current_trip_id");
+      }
+
+      function askTravelGroup() {
+        const content = `Excellent! I'm delighted to help you create an unforgettable travel experience. 🎉<br><br><strong>Please tell me about your travel companions:</strong>
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="sendButtonResponse('Solo adventure - just me', {traveler_type: 'solo'})">
+                        🎒 Solo Explorer
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Romantic getaway for two', {traveler_type: 'couple'})">
+                        💕 Couple's Retreat
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Family vacation with loved ones', {traveler_type: 'family'})">
+                        👨‍👩‍👧‍👦 Family Adventure
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Friends group expedition', {traveler_type: 'friends'})">
+                        👫 Friends Getaway
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Multi-generational family trip', {traveler_type: 'elders'})">
+                        👴👵 Extended Family
+                    </button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function askMoodPreferences() {
+        const content = `Perfect! Now let's discuss the type of experience you're seeking. <strong>What kind of travel atmosphere resonates with you?</strong><br><br><em>You may select multiple options that appeal to you:</em>
+                <div class="mood-grid">
+                    <div class="mood-box" onclick="toggleMood(this, 'chill')" data-mood="chill">
+                        <span class="mood-icon">🧘</span>
+                        <div class="mood-title">Relaxation & Wellness</div>
+                        <div class="mood-desc">Rejuvenating experiences</div>
+                    </div>
+                    <div class="mood-box" onclick="toggleMood(this, 'adventure')" data-mood="adventure">
+                        <span class="mood-icon">🏔️</span>
+                        <div class="mood-title">Adventure & Thrills</div>
+                        <div class="mood-desc">Exciting activities</div>
+                    </div>
+                    <div class="mood-box" onclick="toggleMood(this, 'food')" data-mood="food">
+                        <span class="mood-icon">🍕</span>
+                        <div class="mood-title">Culinary Exploration</div>
+                        <div class="mood-desc">Gastronomic delights</div>
+                    </div>
+                    <div class="mood-box" onclick="toggleMood(this, 'spiritual')" data-mood="spiritual">
+                        <span class="mood-icon">🕯️</span>
+                        <div class="mood-title">Spiritual Journey</div>
+                        <div class="mood-desc">Mindful experiences</div>
+                    </div>
+                    <div class="mood-box" onclick="toggleMood(this, 'culture')" data-mood="culture">
+                        <span class="mood-icon">🏛️</span>
+                        <div class="mood-title">Cultural Immersion</div>
+                        <div class="mood-desc">Heritage & traditions</div>
+                    </div>
+                    <div class="mood-box" onclick="toggleMood(this, 'instagram')" data-mood="instagram">
+                        <span class="mood-icon">📸</span>
+                        <div class="mood-title">Photography Focus</div>
+                        <div class="mood-desc">Picture-perfect moments</div>
+                    </div>
+                    <div class="mood-box" onclick="toggleMood(this, 'nature')" data-mood="nature">
+                        <span class="mood-icon">🌿</span>
+                        <div class="mood-title">Nature Connection</div>
+                        <div class="mood-desc">Outdoor experiences</div>
+                    </div>
+                    <div class="mood-box" onclick="toggleMood(this, 'nightlife')" data-mood="nightlife">
+                        <span class="mood-icon">🎉</span>
+                        <div class="mood-title">Vibrant Nightlife</div>
+                        <div class="mood-desc">Evening entertainment</div>
+                    </div>
+                </div>
+                <button class="continue-btn" id="moodContinueBtn" onclick="submitMoodSelection()">
+                    Continue with Selected Preferences ✨
+                </button>`;
+        addMessage(content, "bot");
+      }
+
+      function toggleMood(element, mood) {
+        element.classList.toggle("selected");
+
+        if (element.classList.contains("selected")) {
+          if (!selectedMoods.includes(mood)) {
+            selectedMoods.push(mood);
+          }
+        } else {
+          selectedMoods = selectedMoods.filter((m) => m !== mood);
+        }
+
+        const continueBtn = document.getElementById("moodContinueBtn");
+        if (selectedMoods.length > 0) {
+          continueBtn.classList.add("active");
+        } else {
+          continueBtn.classList.remove("active");
+        }
+      }
+
+      function submitMoodSelection() {
+        if (selectedMoods.length === 0) return;
+
+        const moodNames = {
+          chill: "🧘 Relaxation & Wellness",
+          adventure: "🏔️ Adventure & Thrills",
+          food: "🍕 Culinary Exploration",
+          spiritual: "🕯️ Spiritual Journey",
+          culture: "🏛️ Cultural Immersion",
+          instagram: "📸 Photography Focus",
+          nature: "🌿 Nature Connection",
+          nightlife: "🎉 Vibrant Nightlife",
+        };
+
+        const selectedNames = selectedMoods
+          .map((mood) => moodNames[mood])
+          .join(", ");
+        tripData.moods = [...selectedMoods];
+        sendButtonResponse(`My selected preferences: ${selectedNames}`, {
+          moods: selectedMoods,
+        });
+      }
+
+      function askTransportation() {
+        const content = `Excellent choices! <strong>What is your preferred mode of transportation?</strong>
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="sendButtonResponse('Private car/Road trip', {transport_type: 'car'})">
+                        🚗 Private Vehicle
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Air travel', {transport_type: 'flight'})">
+                        ✈️ Flight
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Train journey', {transport_type: 'train'})">
+                        🚂 Train
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Bus travel', {transport_type: 'bus'})">
+                        🚌 Bus
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Flexible - multiple transport options', {transport_type: 'mixed'})">
+                        🎯 Mixed Transportation
+                    </button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function askAccommodation() {
+        const content = `Perfect! <strong>What type of accommodation would you prefer?</strong>
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="sendButtonResponse('Budget-friendly accommodations', {accommodation: 'budget'})">
+                        🏨 Budget Stays
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Mid-range hotels with good amenities', {accommodation: 'mid'})">
+                        🏩 Mid-Range Hotels
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Luxury accommodations', {accommodation: 'luxury'})">
+                        🏰 Premium Luxury
+                    </button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function askBudget() {
+        const content = `Excellent! <strong>What is your approximate budget range for this entire trip?</strong>
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="sendButtonResponse('Under $500 - Budget conscious', {budget: 'low'})">
+                        💸 Budget-Friendly (Under $500)
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('$500 - $2000 - Moderate budget', {budget: 'medium'})">
+                        💰 Moderate ($500 - $2000)
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('$2000+ - Premium budget', {budget: 'high'})">
+                        💎 Premium ($2000+)
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Unlimited budget - best experiences', {budget: 'unlimited'})">
+                        🤑 Unlimited Budget
+                    </button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function askRoutePreference() {
+        const content = `Wonderful! <strong>What type of travel route appeals to you most?</strong>
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="sendButtonResponse('Scenic route with beautiful views', {route_preference: 'scenic'})">
+                        🌄 Scenic & Beautiful
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Fastest and most efficient route', {route_preference: 'fast'})">
+                        ⚡ Fast & Efficient
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Flexible - either option works', {route_preference: 'flexible'})">
+                        🤷 Flexible Route
+                    </button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function askWeatherPreference() {
+        const content = `Almost done! <strong>What weather conditions do you prefer for your travels?</strong>
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="sendButtonResponse('Sunny and warm weather', {weather_preference: 'sunny'})">
+                        ☀️ Sunny & Warm
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Avoid rainy conditions', {weather_preference: 'no_rain'})">
+                        🌧️ No Rain Please
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Cool and comfortable weather', {weather_preference: 'cold'})">
+                        ❄️ Cool & Comfortable
+                    </button>
+                    <button class="option-btn" onclick="sendButtonResponse('Any weather is fine', {weather_preference: 'any'})">
+                        🤷 Weather Flexible
+                    </button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function generateRecommendations() {
+        addMessage(
+          "Excellent! I now have all the information needed to create your personalized travel experience. 🎯<br><br>I'm currently processing your preferences to:<br>• Identify perfect attractions matching your interests<br>• Create an optimized day-by-day itinerary<br>• Find accommodations within your budget<br>• Suggest authentic local experiences<br>• Include weather-appropriate activities<br><br><div class='loading'></div> Crafting your personalized recommendations...",
+          "bot"
+        );
+
+        setTimeout(() => {
+          showFinalRecommendations();
+        }, 3000);
+      }
+
+      function showFinalRecommendations() {
+        const content = `🎉 <strong>Your personalized travel plan is ready!</strong><br><br>I've carefully curated recommendations based on your preferences and created a comprehensive itinerary tailored specifically for your travel style.<br><br>✨ <strong>Your customized plan includes:</strong><br>• Handpicked attractions aligned with your interests<br>• Optimized daily schedules for your group size<br>• Budget-conscious recommendations<br>• Weather-appropriate activities<br>• Authentic local experiences and hidden gems<br><br>🎯 <strong>Would you like to view your personalized recommendations?</strong><br><br>
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="viewRecommendations()" style="background: linear-gradient(135deg, #0077b6ff 0%, #00b4d8ff 100%); color: white; border: none; font-weight: 600;">
+                        🗺️ View My Travel Plan
+                    </button>
+                    <button class="option-btn" onclick="startOver()">
+                        🔄 Plan Another Trip
+                    </button>
+                </div>`;
+        addMessage(content, "bot");
+      }
+
+      function handleAdditionalQuestions() {
+        addMessage(
+          "I'm here to assist you with any additional questions about your travel plans. Feel free to ask about destinations, activities, or if you'd like to create another personalized itinerary! 😊",
+          "bot"
+        );
+      }
+
+      function startOver() {
+        messageCount = 0;
+        tripData = {
+          source: "",
+          destination: "",
+          travel_date: "",
+          duration: "",
+          num_travelers: 0,
+          traveler_type: "",
+          moods: [],
+          transport_type: "",
+          accommodation: "",
+          budget: "",
+          route_preference: "",
+          weather_preference: "",
+          show_popular: false,
+          save_preferences: false,
+        };
+        selectedMoods = [];
+        addMessage("🔄 Starting a new travel planning session", "user");
+        showTypingIndicator();
+        setTimeout(() => {
+          hideTypingIndicator();
+          addMessage(
+            "Wonderful! I'm excited to help you plan another amazing adventure. Let's create your next perfect travel experience! 🌍",
+            "bot"
+          );
+        }, 1000);
+      }
+
+      function viewRecommendations() {
+        // Ensure moods are properly set in tripData
+        if (selectedMoods.length > 0) {
+          tripData.moods = [...selectedMoods];
+        }
+
+        console.log("Sending trip data:", tripData);
+
+        // Get recommendations from the itinerary app
+        fetch("/api/get_recommendations/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({
+            destination: tripData.destination,
+            moods: tripData.moods,
+            interests: [], // Add if you have interests
+            travel_style: tripData.traveler_type || "relaxed",
+            budget: tripData.budget || "medium",
+            group_size: tripData.num_travelers || 1,
+            duration: tripData.duration || 3,
+            show_popular: tripData.show_popular || false,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return response.json().then((err) => {
+                throw err;
+              });
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.success) {
+              window.location.href = data.redirect_url;
+            } else {
+              throw new Error(data.message || "Unknown error");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            addMessage(
+              `I apologize, but there was an issue: ${error.message}. Please try again!`,
+              "bot"
+            );
+          });
+      }
+
+      // Additional utility function to manually save trip (can be called from other parts of the app)
+      function saveCurrentTrip() {
+        if (
+          Object.keys(tripData).some(
+            (key) =>
+              tripData[key] !== "" &&
+              tripData[key] !== 0 &&
+              tripData[key] !== false &&
+              !(Array.isArray(tripData[key]) && tripData[key].length === 0)
+          )
+        ) {
+          return saveTripData();
+        } else {
+          console.warn("No trip data to save");
+          return Promise.resolve(false);
+        }
+      }
+
+      // Helper function to get CSRF token
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      // Initialize chat
+      document.addEventListener("DOMContentLoaded", function () {
+        chatInput.focus();
+        chatInput.style.height = "50px";
+
+        // Check for existing trip data
+        const savedTrip = getSavedTrip();
+        if (savedTrip) {
+          tripData = savedTrip;
+          selectedMoods = savedTrip.moods || [];
+          messageCount = 15; // Skip to recommendations if data exists
+
+          addMessage(
+            "Welcome back! I found your saved trip data. Would you like to continue where you left off?",
+            "bot"
+          );
+          showFinalRecommendations();
+        } else {
+          // Start new conversation
+          addMessage(
+            "Welcome! I'm your personal travel planning assistant. Let's create an amazing journey tailored just for you! 🌟",
+            "bot"
+          );
+        }
+      });
+    </script>
+  </body>
+</html>
